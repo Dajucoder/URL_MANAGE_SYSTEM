@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (
     QGridLayout, QTextEdit, QSplitter
 )
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QFont, QPixmap, QIcon
+from PyQt6.QtGui import QFont, QPixmap, QIcon, QPainter, QPainterPath
 
 # 添加项目根目录到路径
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -128,6 +128,55 @@ class MainWindow(QWidget):
         self.current_websites = []
         self.init_ui()
         self.load_all_websites()
+        
+    def load_user_avatar(self):
+        """加载用户头像"""
+        try:
+            avatar_path = self.user_info.get('avatar_path', 'default_avatar.png')
+            full_path = f"assets/avatars/{avatar_path}"
+            
+            if os.path.exists(full_path):
+                pixmap = QPixmap(full_path)
+                # 创建圆形头像
+                rounded_pixmap = self.create_rounded_avatar(pixmap)
+                self.user_avatar.setPixmap(rounded_pixmap)
+            else:
+                # 设置默认头像
+                self.user_avatar.setText("👤")
+                self.user_avatar.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.user_avatar.setStyleSheet("""
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 16px;
+                    border: 2px solid white;
+                    color: white;
+                    font-size: 16px;
+                """)
+        except Exception as e:
+            print(f"❌ 加载用户头像失败: {e}")
+            
+    def create_rounded_avatar(self, pixmap):
+        """创建圆形头像"""
+        if pixmap.isNull():
+            return pixmap
+            
+        size = min(32, 32)
+        rounded = QPixmap(size, size)
+        rounded.fill(Qt.GlobalColor.transparent)
+        
+        painter = QPainter(rounded)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # 创建圆形路径
+        path = QPainterPath()
+        path.addEllipse(0, 0, size, size)
+        painter.setClipPath(path)
+        
+        # 绘制缩放后的图片
+        scaled_pixmap = pixmap.scaled(size, size, Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
+        painter.drawPixmap(0, 0, scaled_pixmap)
+        painter.end()
+        
+        return rounded
     
     def init_ui(self):
         """初始化界面"""
@@ -221,10 +270,23 @@ class MainWindow(QWidget):
         """创建工具栏"""
         toolbar_layout = QHBoxLayout()
         
-        # 用户信息
-        user_label = QLabel(f"👤 当前用户: {self.user_info['username']}")
+        # 用户信息区域（头像和用户名）
+        user_info_layout = QHBoxLayout()
+        user_info_layout.setSpacing(10)
+        
+        # 用户头像
+        self.user_avatar = QLabel()
+        self.user_avatar.setFixedSize(32, 32)
+        self.user_avatar.setScaledContents(True)
+        self.user_avatar.setStyleSheet("border-radius: 16px; border: 2px solid white;")
+        self.load_user_avatar()
+        user_info_layout.addWidget(self.user_avatar)
+        
+        # 用户名
+        user_label = QLabel(f"👤 当前用户: {self.user_info.get('display_name', self.user_info['username'])}")
         user_font = QFont("Microsoft YaHei", 12, QFont.Weight.Bold)
         user_label.setFont(user_font)
+        user_info_layout.addWidget(user_label)
         
         # 搜索框
         self.search_input = QLineEdit()
@@ -262,7 +324,7 @@ class MainWindow(QWidget):
         buttons_layout.addWidget(my_websites_btn)
         buttons_layout.addWidget(logout_button)
         
-        toolbar_layout.addWidget(user_label)
+        toolbar_layout.addLayout(user_info_layout)
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.search_input)
         toolbar_layout.addLayout(buttons_layout)
@@ -534,10 +596,14 @@ class MainWindow(QWidget):
         # 更新界面显示
         self.setWindowTitle(f"🌐 网站推荐系统 - 欢迎 {self.user_info['username']}")
         
+        # 更新头像
+        self.load_user_avatar()
+        
         # 如果工具栏中有用户标签，也需要更新
         for child in self.findChildren(QLabel):
             if child.text().startswith("👤 当前用户:"):
-                child.setText(f"👤 当前用户: {self.user_info['username']}")
+                display_name = self.user_info.get('display_name', self.user_info['username'])
+                child.setText(f"👤 当前用户: {display_name}")
                 break
         
         print(f"✅ 用户信息已更新: {self.user_info['username']}")

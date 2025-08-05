@@ -262,6 +262,12 @@ class ProfileWindow(QWidget):
         layout = QFormLayout()
         layout.setSpacing(15)
         
+        # 用户名修改
+        self.username_input = QLineEdit()
+        self.username_input.setText(self.user_info['username'])
+        self.username_input.setPlaceholderText("3-50个字符，支持中文、字母、数字、下划线")
+        layout.addRow("用户名:", self.username_input)
+        
         # 显示名称
         self.display_name_input = QLineEdit()
         self.display_name_input.setPlaceholderText("请输入显示名称")
@@ -487,9 +493,28 @@ class ProfileWindow(QWidget):
     
     def save_profile(self):
         """保存个人信息"""
+        username = self.username_input.text().strip()
         display_name = self.display_name_input.text().strip()
         email = self.email_input.text().strip()
         avatar_path = self.user_info.get('avatar_path', 'default_avatar.png')
+        
+        # 验证用户名
+        if username != self.user_info['username']:
+            # 验证用户名格式
+            if not username or len(username) < 3 or len(username) > 50:
+                QMessageBox.warning(self, "格式错误", "用户名长度必须在3-50个字符之间")
+                return
+            
+            if not re.match(r'^[a-zA-Z0-9_\u4e00-\u9fa5]+$', username):
+                QMessageBox.warning(self, "格式错误", "用户名只能包含字母、数字、下划线和中文")
+                return
+            
+            # 检查用户名是否已存在
+            query = "SELECT id FROM users WHERE username = %s AND id != %s"
+            result = self.db_manager.execute_query(query, (username, self.user_info['id']))
+            if result:
+                QMessageBox.warning(self, "用户名已存在", "该用户名已被其他用户使用，请选择其他用户名")
+                return
         
         # 验证邮箱格式
         if email:
@@ -501,17 +526,21 @@ class ProfileWindow(QWidget):
         
         # 更新数据库
         update_query = """
-        UPDATE users SET display_name = %s, email = %s, avatar_path = %s, updated_at = %s 
+        UPDATE users SET username = %s, display_name = %s, email = %s, avatar_path = %s, updated_at = %s 
         WHERE id = %s
         """
         
         if self.db_manager.execute_non_query(update_query, (
-            display_name, email, avatar_path, datetime.now(), self.user_info['id']
+            username, display_name, email, avatar_path, datetime.now(), self.user_info['id']
         )):
             # 更新用户信息
+            self.user_info['username'] = username
             self.user_info['display_name'] = display_name
             self.user_info['email'] = email
             self.user_info['avatar_path'] = avatar_path
+            
+            # 更新窗口标题
+            self.setWindowTitle(f"👤 个人信息 - {username}")
             
             QMessageBox.information(self, "成功", "个人信息保存成功！")
             self.profile_updated.emit(self.user_info)
