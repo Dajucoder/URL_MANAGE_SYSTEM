@@ -1,0 +1,19 @@
+# 网站推荐系统配置文件示例
+# 复制此文件为 config.ini 并填入实际配置信息
+
+[database]
+host = localhost
+port = 5432
+database = user_auth_system
+user = postgres
+password = your_password_here
+
+[application]
+window_width = 450
+window_height = 550
+remember_login = true
+auto_login = false
+
+[ui]
+theme = dark_blue
+language = zh_CN
