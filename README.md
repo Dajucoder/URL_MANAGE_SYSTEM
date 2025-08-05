@@ -1,276 +1,331 @@
-# 🌐 网站推荐系统
+# 🌐 URL管理系统
 
-一个基于 PyQt6 和 PostgreSQL 的现代化网站推荐平台，具有深蓝渐变界面设计和完整的用户认证功能。
+一个基于 PyQt6 和 PostgreSQL 的现代化网站推荐与管理平台，提供优雅的用户界面和完整的用户认证功能。
 
-## ✨ 系统特色
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![PyQt6](https://img.shields.io/badge/PyQt6-6.4+-green.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-orange.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-- 🔐 **安全认证** - SHA256 密码加密，PostgreSQL 数据存储
-- 🎨 **现代界面** - 深蓝渐变设计，响应式布局
-- 🌐 **智能推荐** - 5大分类，20+精选优质网站
-- 🔍 **实时搜索** - 关键词搜索，分类筛选
-- 🚀 **一键访问** - 点击卡片直接跳转网站
+## ✨ 核心特性
+
+- 🔐 **安全认证系统** - SHA256 密码加密，PostgreSQL 安全存储
+- 🎨 **现代化界面** - 深蓝渐变设计，响应式布局，用户体验优先
+- 🌐 **智能网站推荐** - 多分类网站管理，精选优质资源
+- 🔍 **实时搜索功能** - 支持关键词搜索和分类筛选
+- 🚀 **一键快速访问** - 点击即可跳转到目标网站
+- 👥 **多用户支持** - 完整的用户注册、登录和权限管理
+- 📱 **跨平台兼容** - 支持 Windows、macOS 和 Linux
 
 ## 📁 项目结构
 
 ```
-网站推荐系统/
-├── app.py                      # 🚀 主启动文件
-├── init_database.py            # 🗄️ 数据库初始化脚本
-├── requirements.txt            # 📦 依赖包列表
-├── config.ini                  # ⚙️ 系统配置文件
-├── README.md                   # 📖 项目说明文档
-└── src/                        # 📂 源代码目录
-    ├── core/                   # 🔐 核心功能模块
-    │   └── final_system.py     # 用户认证系统
-    ├── ui/                     # 🎨 用户界面模块
-    │   └── main_window.py      # 主窗口界面
-    └── data/                   # 📊 数据管理模块
-        └── website_data.py     # 网站数据管理
+URL_MANAGE_SYSTEM/
+├── 📄 app.py                   # 主启动文件
+├── 📄 requirements.txt         # 项目依赖
+├── 📄 config.ini.example       # 配置文件模板
+├── 📄 LICENSE                  # MIT 开源许可证
+├── 📄 CONTRIBUTING.md          # 贡献指南
+├── 📄 .gitignore              # Git 忽略规则
+├── 📂 src/                     # 源代码目录
+│   ├── 📂 core/               # 核心功能模块
+│   │   └── auth_system.py     # 用户认证系统
+│   ├── 📂 ui/                 # 用户界面模块
+│   │   ├── main_window.py     # 主窗口界面
+│   │   ├── login_window.py    # 登录窗口
+│   │   ├── admin_window.py    # 管理员界面
+│   │   ├── profile_window.py  # 用户资料界面
+│   │   └── user_websites_window.py # 用户网站管理
+│   └── 📂 data/               # 数据管理模块
+│       └── website_data.py    # 网站数据管理
+├── 📂 scripts/                # 工具脚本
+│   └── init_database_enhanced.py # 数据库初始化
+└── 📂 assets/                 # 静态资源
+    └── avatars/               # 用户头像
 ```
 
 ## 🚀 快速开始
 
-### 环境要求
-- Python 3.8+
-- PostgreSQL 12+
-- PyQt6
+### 📋 环境要求
+- **Python**: 3.8 或更高版本
+- **数据库**: PostgreSQL 12 或更高版本
+- **操作系统**: Windows 10/11, macOS 10.14+, Ubuntu 18.04+
 
-### 安装步骤
+### ⚡ 快速安装
 
 1. **克隆项目**
 ```bash
-git clone <项目地址>
-cd 网站推荐系统
+git clone https://github.com/Dajucoder/URL_MANAGE_SYSTEM.git
+cd URL_MANAGE_SYSTEM
 ```
 
-2. **安装依赖**
+2. **创建虚拟环境**
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+```
+
+3. **安装依赖**
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **配置数据库**
+4. **配置数据库**
 ```bash
-# 确保 PostgreSQL 服务运行
-# 修改 config.ini 中的数据库连接信息
+# 复制配置文件模板
+cp config.ini.example config.ini
+# 编辑 config.ini 填入数据库配置
 ```
 
-4. **初始化数据库**
+5. **初始化数据库**
 ```bash
-python init_database.py
+python scripts/init_database_enhanced.py
 ```
 
-5. **启动系统**
+6. **启动应用**
 ```bash
 python app.py
 ```
 
-## 🎯 功能模块
+### 🎯 默认账户
+- **管理员账户**: `admin` / `admin123`
+- **功能**: 完整的系统管理权限
+
+## 🎯 核心功能
 
 ### 🔐 用户认证系统
-- ✅ 用户注册与登录
-- ✅ 密码 SHA256 加密存储
-- ✅ 用户信息管理
-- ✅ 登录状态记忆
-- ✅ 安全登出功能
+- ✅ **安全注册登录** - 支持用户名、邮箱注册
+- ✅ **密码加密存储** - SHA256 哈希算法保护
+- ✅ **用户权限管理** - 普通用户与管理员权限分离
+- ✅ **会话状态管理** - 安全的登录状态保持
+- ✅ **用户资料管理** - 个人信息编辑和头像设置
 
-### 🌐 网站推荐功能
-- ✅ **分类浏览** - 5大主要分类
-- ✅ **智能搜索** - 实时关键词搜索
-- ✅ **热门推荐** - 高评分网站展示
-- ✅ **一键访问** - 直接跳转到目标网站
-- ✅ **网站详情** - 名称、描述、分类、评分
+### 🌐 网站管理功能
+- ✅ **分类管理** - 多层级网站分类系统
+- ✅ **智能搜索** - 实时关键词搜索和筛选
+- ✅ **网站收藏** - 个人网站收藏夹功能
+- ✅ **一键访问** - 快速跳转到目标网站
+- ✅ **批量操作** - 支持批量添加、编辑、删除
 
-### 📊 网站分类
+### 👥 管理员功能
+- ✅ **用户管理** - 查看、编辑、删除用户账户
+- ✅ **网站审核** - 审核用户提交的网站信息
+- ✅ **系统统计** - 用户活跃度和网站访问统计
+- ✅ **权限控制** - 灵活的权限分配机制
 
-#### 🎓 学习教育
-- 📚 中国大学MOOC - 国家智慧教育平台
-- 🎓 学堂在线 - 清华大学精品课程平台
-- 📖 知乎 - 高质量问答社区
-- 💻 菜鸟教程 - 编程技术学习平台
+### 📊 预设网站分类
 
-#### 💻 开发工具
-- 🐙 GitHub - 全球最大代码托管平台
-- 🔧 Stack Overflow - 程序员问答社区
-- 📝 CodePen - 前端代码在线编辑器
-- 🎨 Figma - 协作式界面设计工具
+| 分类 | 描述 | 示例网站 |
+|------|------|----------|
+| 🎓 **学习教育** | 在线教育、学术资源 | 中国大学MOOC、知乎、菜鸟教程 |
+| 💻 **开发工具** | 编程开发、技术社区 | GitHub、Stack Overflow、CodePen |
+| 🎵 **娱乐休闲** | 音乐影视、游戏娱乐 | 网易云音乐、哔哩哔哩、Steam |
+| 🛠️ **实用工具** | 日常工具、办公软件 | 百度、QQ邮箱、百度网盘 |
+| 📰 **新闻资讯** | 新闻媒体、行业资讯 | 新浪新闻、36氪、IT之家 |
 
-#### 🎵 娱乐休闲
-- 🎵 网易云音乐 - 发现音乐，遇见美好
-- 📺 哔哩哔哩 - 年轻人的文化社区
-- 🎮 Steam - PC游戏数字发行平台
-- 📖 豆瓣 - 书影音记录生活
+## 🎨 界面预览
 
-#### 🛠️ 实用工具
-- 🌐 百度 - 全球最大中文搜索引擎
-- 📧 QQ邮箱 - 腾讯邮箱服务
-- ☁️ 百度网盘 - 个人云存储服务
-- 🗺️ 高德地图 - 专业地图导航服务
+### 🔐 登录界面
+- **现代化设计** - 深蓝渐变背景，视觉效果优雅
+- **双模式切换** - 登录/注册选项卡无缝切换
+- **响应式布局** - 适配不同屏幕尺寸
+- **中文本地化** - 完整的中文界面支持
 
-#### 📰 新闻资讯
-- 📰 新浪新闻 - 及时准确的新闻资讯
-- 💼 36氪 - 科技创业资讯平台
-- 🏢 虎嗅网 - 商业资讯与观点平台
-- 📱 IT之家 - IT科技资讯网站
+### 🏠 主界面
+- **网站卡片** - 精美的网站信息展示卡片
+- **分类导航** - 左侧快速分类切换面板
+- **实时搜索** - 顶部搜索栏支持即时筛选
+- **用户中心** - 个人信息和设置管理
+- **管理面板** - 管理员专用的系统管理界面
 
-## 🎨 界面展示
+## 💡 使用说明
 
-### 登录界面
-- 深蓝渐变背景设计
-- 选项卡式登录/注册切换
-- 现代化表单组件
-- 完整的中文本地化支持
+### 🆕 新用户注册
+```
+1. 选择"注册"选项卡
+2. 输入用户名（3-50字符，支持中英文）
+3. 填写邮箱地址（可选，用于找回密码）
+4. 设置安全密码（至少6位字符）
+5. 确认密码后点击"注册"按钮
+```
 
-### 主界面
-- **网站卡片展示** - 3列网格布局
-- **分类导航面板** - 左侧快速分类切换
-- **搜索功能栏** - 顶部实时搜索
-- **用户信息显示** - 当前登录用户信息
-- **响应式设计** - 适配不同屏幕尺寸
-
-## 💡 使用指南
-
-### 新用户注册
-1. 启动系统后选择"用户注册"选项卡
-2. 填写用户名（3-50字符，支持中文）
-3. 输入邮箱地址（可选）
-4. 设置密码（至少6位字符）
-5. 确认密码并点击"注册新账户"
-
-### 用户登录
-1. 在"用户登录"选项卡输入用户名和密码
+### 🔑 用户登录
+```
+1. 在"登录"选项卡输入凭据
 2. 可选择"记住登录状态"
-3. 点击"登录系统"或按回车键
+3. 点击"登录"或按回车键确认
+4. 管理员账户拥有额外管理权限
+```
 
-### 浏览网站
-1. 登录后进入主界面
-2. 左侧面板选择感兴趣的分类
-3. 浏览网站卡片，查看详细信息
-4. 点击"访问网站"按钮直接跳转
+### 🌐 网站浏览
+```
+1. 主界面左侧选择网站分类
+2. 浏览网站卡片查看详细信息
+3. 点击"访问网站"直接跳转
+4. 使用收藏功能保存喜欢的网站
+```
 
-### 搜索功能
-1. 在顶部搜索框输入关键词
-2. 系统实时显示匹配的网站
-3. 支持网站名称、描述、分类搜索
+### 🔍 搜索功能
+```
+1. 顶部搜索框输入关键词
+2. 支持网站名称、描述、分类搜索
+3. 实时显示匹配结果
+4. 可结合分类筛选精确查找
+```
 
 ## 🔧 技术架构
 
-### 核心技术栈
-- **前端框架**: PyQt6 - 现代化跨平台GUI框架
-- **数据库**: PostgreSQL - 企业级关系型数据库
-- **编程语言**: Python 3.8+ - 简洁高效的开发语言
-- **架构模式**: MVC - 模型-视图-控制器分离
+### 💻 核心技术栈
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| **Python** | 3.8+ | 主要开发语言 |
+| **PyQt6** | 6.4+ | 跨平台GUI框架 |
+| **PostgreSQL** | 12+ | 关系型数据库 |
+| **psycopg2** | 2.9+ | 数据库连接器 |
 
-### 安全特性
-- **密码加密**: SHA256 哈希算法
-- **SQL注入防护**: 参数化查询
-- **输入验证**: 用户名、邮箱、密码格式验证
-- **会话管理**: 安全的登录状态管理
+### 🔒 安全特性
+- **🔐 密码加密**: SHA256 哈希算法安全存储
+- **🛡️ SQL注入防护**: 参数化查询防止注入攻击
+- **✅ 输入验证**: 严格的用户输入格式验证
+- **🔑 会话管理**: 安全的用户会话状态管理
+- **👥 权限控制**: 基于角色的访问控制系统
 
-### 数据存储
-- **用户表**: 存储用户基本信息和认证数据
-- **配置文件**: INI格式的系统配置
-- **网站数据**: Python字典结构的网站信息
+### 🏗️ 架构设计
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   UI Layer      │    │  Core Layer     │    │  Data Layer     │
+│                 │    │                 │    │                 │
+│ • Login Window  │◄──►│ • Auth System   │◄──►│ • PostgreSQL    │
+│ • Main Window   │    │ • Config Mgr    │    │ • User Tables   │
+│ • Admin Panel   │    │ • Data Manager  │    │ • Website Data  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
-## 📋 配置说明
+## ⚙️ 配置管理
 
-### config.ini 配置文件
+### 📝 配置文件结构
 ```ini
 [database]
-host = localhost
-port = 5432
-database = user_auth_system
-user = postgres
-password = your_password
+host = localhost          # 数据库主机地址
+port = 5432              # 数据库端口
+database = user_auth_system  # 数据库名称
+user = postgres          # 数据库用户名
+password = your_password # 数据库密码
 
 [application]
-window_width = 450
-window_height = 550
-remember_login = true
-auto_login = false
+window_width = 1000      # 窗口宽度
+window_height = 650      # 窗口高度
+remember_login = true    # 记住登录状态
+auto_login = false       # 自动登录
 
 [ui]
-theme = dark_blue
-language = zh_CN
+theme = dark_blue        # 界面主题
+language = zh_CN         # 界面语言
 ```
 
-## 🛠️ 故障排除
+## 🚨 故障排除
 
-### 常见问题
+### ❓ 常见问题解决
 
-**1. 数据库连接失败**
+<details>
+<summary><strong>🔌 数据库连接问题</strong></summary>
+
 ```bash
-# 检查 PostgreSQL 服务状态
+# 1. 检查 PostgreSQL 服务状态
 # Windows
 net start postgresql-x64-12
+# macOS
+brew services start postgresql
+# Linux
+sudo systemctl start postgresql
 
-# 检查配置文件中的数据库信息
+# 2. 验证数据库配置
+psql -U postgres -h localhost -p 5432
+
+# 3. 检查防火墙设置
+# 确保 5432 端口未被阻止
 ```
+</details>
 
-**2. 模块导入错误**
+<details>
+<summary><strong>📦 依赖安装问题</strong></summary>
+
 ```bash
-# 重新安装依赖
+# 1. 更新 pip
+python -m pip install --upgrade pip
+
+# 2. 清理缓存重新安装
+pip cache purge
 pip install -r requirements.txt
 
-# 检查 Python 路径
-python -c "import sys; print(sys.path)"
+# 3. 使用国内镜像源
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
 ```
+</details>
 
-**3. 界面显示异常**
+<details>
+<summary><strong>🖥️ 界面显示问题</strong></summary>
+
 ```bash
-# 确认 PyQt6 安装
+# 1. 检查 PyQt6 安装
 pip show PyQt6
 
-# 重新安装 PyQt6
-pip uninstall PyQt6
+# 2. 重新安装 PyQt6
+pip uninstall PyQt6 PyQt6-Qt6 PyQt6-sip
 pip install PyQt6
+
+# 3. 检查系统显示设置
+# 确保系统缩放比例设置合理
 ```
+</details>
 
-### 调试模式
-```bash
-# 启用详细日志输出
-python app.py --debug
-```
+## 📊 性能指标
 
-## 📈 系统性能
+| 指标 | 数值 | 说明 |
+|------|------|------|
+| 🚀 **启动时间** | < 3秒 | 从启动到界面显示 |
+| 💾 **内存占用** | ~50MB | 运行时内存使用 |
+| ⚡ **数据库查询** | < 100ms | 平均查询响应时间 |
+| 🖱️ **界面响应** | < 50ms | 用户操作响应时间 |
+| 👥 **并发用户** | 1000+ | 支持的最大用户数 |
 
-- **启动时间**: < 3秒
-- **内存占用**: ~50MB
-- **数据库查询**: < 100ms
-- **界面响应**: < 50ms
-- **支持用户数**: 1000+
+## 🤝 参与贡献
 
-## 🔄 版本历史
+我们欢迎所有形式的贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详细信息。
 
-### v1.0.0 (当前版本)
-- ✅ 完整的用户认证系统
-- ✅ 网站推荐和分类浏览
-- ✅ 深蓝渐变界面设计
-- ✅ 实时搜索功能
-- ✅ 一键访问网站功能
+### 🔄 开发流程
+1. **Fork** 项目到您的 GitHub 账户
+2. **Clone** 到本地开发环境
+3. **创建** 功能分支进行开发
+4. **提交** 代码并推送到您的仓库
+5. **创建** Pull Request 请求合并
 
-## 🤝 贡献指南
+### 📋 代码规范
+- 遵循 **PEP 8** Python 代码风格
+- 添加完整的**文档字符串**
+- 编写**单元测试**覆盖新功能
+- 使用**规范的提交信息**格式
 
-欢迎提交 Issue 和 Pull Request 来改进项目！
+## 📄 开源许可
 
-### 开发环境搭建
-1. Fork 项目到个人仓库
-2. 创建功能分支
-3. 提交代码并测试
-4. 创建 Pull Request
+本项目基于 **MIT 许可证** 开源 - 查看 [LICENSE](LICENSE) 文件了解详情
 
-## 📄 许可证
+## 🌟 致谢
 
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
-
-## 📞 联系方式
-
-如有问题或建议，请通过以下方式联系：
-
-- 📧 邮箱: [your-email@example.com]
-- 🐙 GitHub: [your-github-username]
+感谢所有为这个项目做出贡献的开发者和用户！
 
 ---
 
-**🎉 网站推荐系统 - 让发现优质网站变得简单高效！**
+<div align="center">
+
+**🎉 URL管理系统 - 让网站管理变得简单高效！**
+
+[![GitHub stars](https://img.shields.io/github/stars/Dajucoder/URL_MANAGE_SYSTEM?style=social)](https://github.com/Dajucoder/URL_MANAGE_SYSTEM/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Dajucoder/URL_MANAGE_SYSTEM?style=social)](https://github.com/Dajucoder/URL_MANAGE_SYSTEM/network)
 
 *最后更新: 2025年8月5日*
+
+</div>

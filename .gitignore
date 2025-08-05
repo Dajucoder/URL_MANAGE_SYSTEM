@@ -52,3 +52,6 @@ credentials.json
 # CodeBuddy 相关
 .codebuddy/
 .kiro/
+
+# 文档目录（根据用户要求忽略）
+docs/
