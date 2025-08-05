@@ -55,3 +55,7 @@ credentials.json
 
 # 文档目录（根据用户要求忽略）
 docs/
+
+# 用户上传的头像文件
+assets/avatars/*
+!assets/avatars/README.md
