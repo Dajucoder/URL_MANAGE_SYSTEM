@@ -11,7 +11,11 @@ import os
 import configparser
 import hashlib
 import re
-from datetime import datetime
+import json
+import random
+import time
+import threading
+from datetime import datetime, timedelta
 
 try:
     import psycopg2
@@ -27,6 +31,168 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont
 
+
+class SecurityManager:
+    """安全管理器 - 处理登录安全相关功能"""
+    
+    def __init__(self):
+        self.failed_attempts = {}  # 记录失败登录尝试
+        self.locked_accounts = {}  # 记录被锁定的账户
+        self.login_history = []    # 登录历史记录
+        self.max_attempts = 5      # 最大尝试次数
+        self.lockout_duration = 300  # 锁定时间（秒）
+    
+    def record_failed_attempt(self, username, ip_address="unknown"):
+        """记录失败的登录尝试"""
+        current_time = datetime.now()
+        
+        if username not in self.failed_attempts:
+            self.failed_attempts[username] = []
+        
+        self.failed_attempts[username].append({
+            'time': current_time,
+            'ip': ip_address
+        })
+        
+        # 清理1小时前的记录
+        cutoff_time = current_time - timedelta(hours=1)
+        self.failed_attempts[username] = [
+            attempt for attempt in self.failed_attempts[username]
+            if attempt['time'] > cutoff_time
+        ]
+        
+        # 检查是否需要锁定账户
+        if len(self.failed_attempts[username]) >= self.max_attempts:
+            self.lock_account(username)
+            return True
+        
+        return False
+    
+    def lock_account(self, username):
+        """锁定账户"""
+        self.locked_accounts[username] = datetime.now()
+        print(f"🔒 账户 {username} 已被锁定，锁定时间: {self.lockout_duration}秒")
+    
+    def is_account_locked(self, username):
+        """检查账户是否被锁定"""
+        if username not in self.locked_accounts:
+            return False
+        
+        lock_time = self.locked_accounts[username]
+        if datetime.now() - lock_time > timedelta(seconds=self.lockout_duration):
+            # 锁定时间已过，解锁账户
+            del self.locked_accounts[username]
+            if username in self.failed_attempts:
+                del self.failed_attempts[username]
+            return False
+        
+        return True
+    
+    def get_remaining_lockout_time(self, username):
+        """获取剩余锁定时间"""
+        if username not in self.locked_accounts:
+            return 0
+        
+        lock_time = self.locked_accounts[username]
+        elapsed = (datetime.now() - lock_time).total_seconds()
+        remaining = max(0, self.lockout_duration - elapsed)
+        return int(remaining)
+    
+    def record_successful_login(self, username, ip_address="unknown"):
+        """记录成功登录"""
+        # 清除失败记录
+        if username in self.failed_attempts:
+            del self.failed_attempts[username]
+        if username in self.locked_accounts:
+            del self.locked_accounts[username]
+        
+        # 记录登录历史
+        self.login_history.append({
+            'username': username,
+            'time': datetime.now(),
+            'ip': ip_address,
+            'status': 'success'
+        })
+        
+        # 只保留最近100条记录
+        if len(self.login_history) > 100:
+            self.login_history = self.login_history[-100:]
+    
+    def check_password_strength(self, password):
+        """检查密码强度"""
+        if len(password) < 6:
+            return False, "密码长度至少需要6位"
+        
+        score = 0
+        feedback = []
+        
+        # 长度检查
+        if len(password) >= 8:
+            score += 1
+        else:
+            feedback.append("建议密码长度至少8位")
+        
+        # 包含数字
+        if re.search(r'\d', password):
+            score += 1
+        else:
+            feedback.append("建议包含数字")
+        
+        # 包含小写字母
+        if re.search(r'[a-z]', password):
+            score += 1
+        else:
+            feedback.append("建议包含小写字母")
+        
+        # 包含大写字母
+        if re.search(r'[A-Z]', password):
+            score += 1
+        else:
+            feedback.append("建议包含大写字母")
+        
+        # 包含特殊字符
+        if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            score += 1
+        else:
+            feedback.append("建议包含特殊字符")
+        
+        # 评估强度
+        if score >= 4:
+            strength = "强"
+        elif score >= 3:
+            strength = "中等"
+        elif score >= 2:
+            strength = "弱"
+        else:
+            strength = "很弱"
+        
+        return True, f"密码强度: {strength}", feedback
+    
+    def get_login_statistics(self, username=None):
+        """获取登录统计信息"""
+        if username:
+            user_logins = [login for login in self.login_history if login['username'] == username]
+            return {
+                'total_logins': len(user_logins),
+                'recent_logins': user_logins[-10:] if user_logins else [],
+                'failed_attempts': len(self.failed_attempts.get(username, [])),
+                'is_locked': self.is_account_locked(username)
+            }
+        else:
+            return {
+                'total_logins': len(self.login_history),
+                'unique_users': len(set(login['username'] for login in self.login_history)),
+                'locked_accounts': len(self.locked_accounts),
+                'recent_activity': self.login_history[-20:] if self.login_history else []
+            }
+    
+    def clear_failed_attempts(self, username):
+        """清除指定用户的失败尝试记录"""
+        if username in self.failed_attempts:
+            del self.failed_attempts[username]
+        if username in self.locked_accounts:
+            del self.locked_accounts[username]
+        print(f"✅ 已清除用户 {username} 的失败登录记录")
 
 class ConfigManager:
     """配置管理器"""
@@ -220,6 +386,7 @@ class AuthController:
     
     def __init__(self, db_manager):
         self.db_manager = db_manager
+        self.security_manager = SecurityManager()
     
     def hash_password(self, password):
         """密码哈希"""
@@ -306,6 +473,11 @@ class AuthController:
         if not username or not password:
             return False, "请输入用户名和密码", None
         
+        # 检查账户是否被锁定
+        if self.security_manager.is_account_locked(username):
+            remaining_time = self.security_manager.get_remaining_lockout_time(username)
+            return False, f"🔒 账户已被锁定，请等待 {remaining_time} 秒后重试", None
+        
         # 查询用户
         query = """
         SELECT id, username, password_hash, email, display_name, avatar_path, is_admin, created_at, last_login 
@@ -314,6 +486,8 @@ class AuthController:
         result = self.db_manager.execute_query(query, (username,))
         
         if not result:
+            # 记录失败尝试（用户名不存在也算失败）
+            self.security_manager.record_failed_attempt(username)
             return False, "用户名不存在", None
         
         user_data = result[0]
@@ -321,7 +495,17 @@ class AuthController:
         
         # 验证密码
         if self.hash_password(password) != stored_password_hash:
-            return False, "密码错误", None
+            # 记录失败尝试
+            is_locked = self.security_manager.record_failed_attempt(username)
+            if is_locked:
+                return False, f"🔒 密码错误次数过多，账户已被锁定 {self.security_manager.lockout_duration} 秒", None
+            else:
+                failed_count = len(self.security_manager.failed_attempts.get(username, []))
+                remaining = self.security_manager.max_attempts - failed_count
+                return False, f"❌ 密码错误，还有 {remaining} 次尝试机会", None
+        
+        # 登录成功，记录成功登录并清除失败记录
+        self.security_manager.record_successful_login(username)
         
         # 更新最后登录时间
         update_query = "UPDATE users SET last_login = %s WHERE username = %s"
@@ -340,6 +524,62 @@ class AuthController:
         }
         
         return True, f"🎉 欢迎回来，{username}！", user
+
+
+class AuthSystem:
+    """认证系统主类 - 整合所有认证相关功能"""
+    
+    def __init__(self, config_file='config.ini'):
+        self.config_manager = ConfigManager(config_file)
+        self.db_config = self.config_manager.get_database_config()
+        
+        self.db_manager = DatabaseManager(
+            host=self.db_config['host'],
+            database=self.db_config['database'],
+            user=self.db_config['user'],
+            password=self.db_config['password'],
+            port=int(self.db_config['port'])
+        )
+        
+        self.auth_controller = AuthController(self.db_manager)
+        self.security_manager = self.auth_controller.security_manager
+    
+    def initialize(self):
+        """初始化认证系统"""
+        # 连接数据库
+        if not self.db_manager.connect():
+            return False, "数据库连接失败"
+        
+        # 创建数据表
+        if not self.db_manager.create_tables():
+            return False, "数据表创建失败"
+        
+        return True, "认证系统初始化成功"
+    
+    def login(self, username, password):
+        """用户登录"""
+        return self.auth_controller.login(username, password)
+    
+    def register(self, username, password, confirm_password, email=None):
+        """用户注册"""
+        return self.auth_controller.register(username, password, confirm_password, email)
+    
+    def get_security_manager(self):
+        """获取安全管理器"""
+        return self.security_manager
+    
+    def get_database_manager(self):
+        """获取数据库管理器"""
+        return self.db_manager
+    
+    def get_config_manager(self):
+        """获取配置管理器"""
+        return self.config_manager
+    
+    def cleanup(self):
+        """清理资源"""
+        if self.db_manager:
+            self.db_manager.disconnect()
 
 
 class LoginWindow(QWidget):
@@ -711,7 +951,9 @@ class LoginWindow(QWidget):
             from src.ui.main_window import MainWindow
             
             self.main_window = MainWindow(user_info)
-            self.main_window.logout_requested.connect(self.handle_logout_from_main)
+            # 检查是否有logout_requested信号
+            if hasattr(self.main_window, 'logout_requested'):
+                self.main_window.logout_requested.connect(self.handle_logout_from_main)
             self.main_window.show()
             
             print("🏠 主窗口已打开")
