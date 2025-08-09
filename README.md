@@ -394,13 +394,6 @@ URL_MANAGE_SYSTEM/
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
-## 📞 支持与联系
-
-- 📧 邮箱: support@example.com
-- 💬 讨论: [GitHub Discussions](../../discussions)
-- 🐛 问题报告: [GitHub Issues](../../issues)
-- 📖 文档: [项目Wiki](../../wiki)
-
 ## 🙏 致谢
 
 感谢所有为这个项目做出贡献的开发者和用户！
