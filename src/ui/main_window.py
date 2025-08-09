@@ -1563,7 +1563,12 @@ class MainWindow(QWidget):
     def update_session_time(self):
         """更新会话时间"""
         session_duration = (datetime.now() - self.session_start_time).total_seconds() / 60
-        self.stats_manager.stats['session_time'] += 1  # 每分钟增加1分钟
+        # 确保统计数据结构存在
+        if not hasattr(self.stats_manager, 'stats_data'):
+            self.stats_manager.stats_data = {}
+        if 'session_time' not in self.stats_manager.stats_data:
+            self.stats_manager.stats_data['session_time'] = 0
+        self.stats_manager.stats_data['session_time'] += 1  # 每分钟增加1分钟
         self.stats_manager.save_statistics()
     
     def closeEvent(self, event):

@@ -3,11 +3,32 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # 虚拟环境
+.venv/
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
 # IDE 配置文件
 .idea/
@@ -15,22 +36,34 @@ ENV/
 *.swp
 *.swo
 *~
+.spyderproject
+.spyproject
+.ropeproject
 
 # 系统文件
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # 日志文件
 *.log
+logs/
+*.log.*
 
 # 数据库文件
 *.db
 *.sqlite3
+*.sqlite
 
 # 配置文件（包含敏感信息）
 config.ini
 *.env
 .env*
+.envrc
 
 # 敏感信息文件
 secrets.json
@@ -39,23 +72,65 @@ credentials.json
 *.pem
 *.p12
 *.pfx
+*.crt
+*.cer
 
 # 备份文件
 *.bak
 *.backup
 *~
+*.orig
 
 # 临时文件
 *.tmp
 *.temp
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
 
 # CodeBuddy 相关
 .codebuddy/
 .kiro/
 
-# 文档目录（根据用户要求忽略）
-docs/
+# 用户数据和统计文件
+stats/
+user_data/
 
 # 用户上传的头像文件
 assets/avatars/*
 !assets/avatars/README.md
+
+# 编译和打包文件
+*.spec
+dist/
+build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
